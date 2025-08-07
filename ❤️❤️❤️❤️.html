@@ -1,0 +1,450 @@
+ <!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Una Carta Especial Para Ti</title>
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 10px;
+      background-color: #ffe6f0;
+      background-image: radial-gradient(#ffb6c1 10%, transparent 11%), 
+                         radial-gradient(#ffb6c1 10%, transparent 11%);
+      background-size: 40px 40px;
+      background-position: 0 0, 20px 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Georgia', serif;
+      color: #660033;
+      touch-action: pan-y;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .pagina {
+      display: none;
+      padding: 25px;
+      width: 100%;
+      max-width: 600px;
+      margin: 15px auto;
+      background-color: rgba(255, 240, 245, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 5px 25px rgba(255, 182, 193, 0.7);
+      position: relative;
+      backdrop-filter: blur(3px);
+      border: 2px solid rgba(255, 182, 193, 0.3);
+      z-index: 2;
+    }
+    .pagina::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      border: 1px solid rgba(204, 0, 102, 0.1);
+      border-radius: 15px;
+      pointer-events: none;
+    }
+    .pagina.active {
+      display: block;
+      animation: fadeIn 0.6s ease;
+    }
+    .botones {
+      text-align: center;
+      margin: 20px 0;
+      position: sticky;
+      bottom: 10px;
+      z-index: 10;
+    }
+    .botones button {
+      background: linear-gradient(to bottom, #ff99cc, #ff66b3);
+      border: none;
+      padding: 12px 20px; /* Botones más pequeños */
+      font-size: 16px; /* Texto más pequeño */
+      border-radius: 50px;
+      cursor: pointer;
+      color: white;
+      margin: 0 8px; /* Menor separación */
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(204, 0, 102, 0.3);
+      width: 40%; /* Ancho reducido */
+      max-width: 140px; /* Máximo más pequeño */
+      font-weight: 600;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .botones button:active {
+      transform: scale(0.95);
+      box-shadow: 0 2px 6px rgba(204, 0, 102, 0.3);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #cc0066;
+      margin-top: 5px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      position: relative;
+    }
+    h1::after, h2::after {
+      content: "❦";
+      display: block;
+      margin-top: 8px;
+      opacity: 0.6;
+      animation: latido 2s infinite;
+    }
+    .flores {
+      text-align: center;
+      font-size: 2.2em;
+      margin-bottom: 15px;
+      animation: latido 3s infinite;
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.1));
+    }
+    .ramo {
+      text-align: center;
+      font-size: 2.8em;
+      margin: 25px 0;
+      animation: rotar 10s linear infinite;
+      filter: drop-shadow(0 5px 8px rgba(0,0,0,0.1));
+    }
+    p {
+      line-height: 1.8;
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+      padding: 0 10px;
+    }
+    .corazon-flotante {
+      position: absolute;
+      font-size: 22px;
+      opacity: 0.7;
+      z-index: 1;
+      animation: flotar 8s linear infinite;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes latido {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+    @keyframes rotar {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes flotar {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0.7; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+    .indicador-paginas {
+      text-align: center;
+      margin: 15px 0;
+      font-size: 15px;
+      color: #cc0066;
+      font-weight: 500;
+      background: rgba(255, 240, 245, 0.7);
+      padding: 6px 12px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-left: 50%;
+      transform: translateX(-50%);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 182, 193, 0.3);
+    }
+    .decoracion {
+      position: fixed;
+      font-size: 18px;
+      z-index: 0;
+      user-select: none;
+      pointer-events: none;
+      opacity: 0.3;
+      animation: flotar 15s linear infinite;
+    }
+    .texto-destacado {
+      background: linear-gradient(transparent 60%, rgba(255, 182, 193, 0.3) 40%);
+      font-style: italic;
+      display: inline-block;
+      padding: 0 5px;
+      border-radius: 5px;
+    }
+    .firma {
+      text-align: center;
+      margin-top: 25px;
+      font-family: 'Brush Script MT', cursive;
+      font-size: 24px;
+      color: #cc0066;
+      animation: latido 3s infinite;
+    }
+    .mensaje-final {
+      text-align: center;
+      font-size: 1.8em;
+      margin: 30px 0;
+      line-height: 1.6;
+      animation: brillo 2s infinite alternate;
+    }
+    @keyframes brillo {
+      from { text-shadow: 0 0 5px rgba(255, 105, 180, 0.5); }
+      to { text-shadow: 0 0 20px rgba(255, 20, 147, 0.8); }
+    }
+    .corazon-pulsante {
+      display: inline-block;
+      animation: latido 1.2s infinite;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Decoraciones flotantes de fondo -->
+<div class="decoracion" style="top:10%; left:5%; font-size:24px; animation-delay:0s;">❦</div>
+<div class="decoracion" style="top:20%; left:90%; animation-delay:2s;">💖</div>
+<div class="decoracion" style="top:40%; left:15%; animation-delay:4s;">🌸</div>
+<div class="decoracion" style="top:70%; left:80%; animation-delay:1s;">🌹</div>
+<div class="decoracion" style="top:85%; left:10%; animation-delay:3s;">🌷</div>
+
+<div id="contenido">
+  <div class="pagina active">
+    <div class="flores">💌🌸🌹💖🌷🌼</div>
+    <h1>Hola Mi Amor</h1>
+    <p>No sé muy bien cómo empezar esto, pero quiero que sepas que cada palabra que leerás aquí está escrita con el alma, con ese pedacito de mí que solo tú conoces. Hoy quiero expresarte lo que siento en este momento, mientras pienso en tu sonrisa.</p>
+    <p>Desde que entraste en mi vida, todo ha cambiado. Los días tienen más color, las noches son más cálidas, y hasta la lluvia parece cantar cuando pienso en ti. Eres la melodía que mi corazón siempre quiso encontrar.</p>
+  </div>
+  
+  <div class="pagina">
+    <p>A veces pienso que decir <span class="texto-destacado">"te amo"</span> no alcanza. Porque lo que siento por ti va más allá de lo que cualquier palabra puede decir. Es algo que se siente en el pecho, como un calorcito bonito que me acompaña cuando pienso en ti, cuando recuerdo tu voz o cuando imagino tu mirada.</p>
+    <p>Tu amor es como un jardín secreto donde todas las flores florecen solo para mí. Cada día descubro una nueva razón para amarte, una nueva cualidad que hace que mi corazón lata más fuerte. Eres mi refugio seguro en este mundo tan complicado.</p>
+  </div>
+  
+  <div class="pagina">
+    <p>Y tus ojos... 💫 tus ojos son el poema más bonito que he leído en mi vida. Cuando los miro (aunque sea en una pantalla), siento que el mundo es un lugar mejor. En ellos encuentro la profundidad del océano, la calidez del atardecer y la promesa de un mañana juntos.</p>
+    <p>Me encanta cómo brillan cuando te ríes, cómo se iluminan cuando hablas de tus sueños, cómo me miran con esa ternura que solo tú sabes expresar. En ellos me pierdo y me encuentro al mismo tiempo.</p>
+  </div>
+  
+  <div class="pagina">
+    <p>Lo que más amo de ti no es solo lo que eres, sino lo que haces en mí. Contigo me siento valiente, suficiente, amado. Tú me das ganas de ser mejor cada día, de superarme, de crecer a tu lado.</p>
+    <p>Gracias por enseñarme que el amor no es posesión sino complicidad, no es control sino confianza, no es perfección sino aceptación. Contigo he aprendido que el verdadero amor es un lugar seguro donde ser uno mismo sin miedos ni máscaras.</p>
+  </div>
+  
+  <div class="pagina">
+    <p>Gracias por estar aquí, por elegirme, por quererme aunque no estemos cerca físicamente. Tú haces que la distancia no duela tanto, porque tu amor atraviesa kilómetros y se instala en mi corazón como si nunca hubiéramos estado separados.</p>
+    <p>Cada mensaje tuyo es un regalo, cada llamada es un tesoro, cada "buenos días" es la mejor manera de comenzar mi jornada. Aunque no podamos tocarnos, siento tu presencia en cada momento de mi día.</p>
+  </div>
+  
+  <div class="pagina">
+    <div class="ramo">💐🌷🌹🌸🌺🌻💖</div>
+    <h2>Un Jardín Para Ti</h2>
+    <p>Si pudiera, te llenaría de flores todos los días. Plantaría rosas en tu camino, jazmines en tu ventana y girasoles en tu jardín. Por ahora, solo puedo darte este pequeño jardín virtual, pero con él va todo mi amor y la promesa de que algún día podré entregarte flores reales cada mañana.</p>
+    <p>Cada flor representa algo que adoro de ti: la rosa tu pasión, el jazmín tu dulzura, el girasol tu calidez, y el tulipán tu elegancia única. Eres un ramo perfecto de todas las virtudes.</p>
+  </div>
+  
+  <div class="pagina">
+    <p>No sabes cuánto deseo poder abrazarte. 💞 A veces me imagino ese momento y se me llenan los ojos de lágrimas bonitas. Será un abrazo que durará una eternidad, donde el tiempo se detendrá y el mundo desaparecerá. Un abrazo que contenga todos los que nos hemos perdido.</p>
+    <p>En ese abrazo pondré todo mi amor, mi anhelo, mis sueños y mis promesas. Será el punto de partida de todos nuestros "para siempre", el comienzo de nuestra proximidad sin fin, el primer capítulo de nuestra vida juntos.</p>
+  </div>
+  
+  <div class="pagina">
+    <p>Te necesito. No como quien necesita algo material, sino como quien ha encontrado a su hogar y no quiere alejarse jamás. Tú eres mi hogar, mi lugar seguro en el universo. En tu amor encuentro la paz que mi alma siempre buscó.</p>
+    <p>Contigo quiero construir un mundo donde las risas sean nuestro idioma, los besos nuestra moneda y los abrazos nuestra religión. Un mundo donde cada atardecer lo veamos juntos, donde cada sueño lo compartamos, donde cada reto lo enfrentemos unidos.</p>
+  </div>
+  
+  <div class="pagina">
+    <p>Tú eres lo más precioso de este mundo. Nadie brilla como tú, nadie me hace sentir como tú. Eres mi persona favorita en este universo tan enorme. Tu sonrisa es mi constelación favorita, tu voz mi canción preferida, tu esencia mi aroma favorito.</p>
+    <p>Me fascina cómo piensas, cómo amas, cómo sueñas. Admiro tu fuerza, tu sensibilidad, tu inteligencia y tu bondad. Eres una combinación perfecta de todo lo hermoso que puede existir en un ser humano.</p>
+  </div>
+  
+  <div class="pagina">
+    <p>Y por si aún no quedó claro... Eres el amor de mi vida. No lo dudes nunca. Y esto, lo que tenemos, lo cuidaré siempre con todo mi corazón, con toda mi alma, con cada fibra de mi ser.</p>
+    <p>Prometo amarte en los días soleados y en las noches tormentosas. Prometo respetarte, valorarte y admirarte cada día más. Prometo ser tu compañero, tu cómplice, tu mejor amigo y tu amor eterno.</p>
+    <div class="firma">Con todo mi amor</div>
+  </div>
+  
+  <!-- NUEVA PÁGINA CON EL MENSAJE ESPECIAL -->
+  <div class="pagina">
+    <div class="flores">💖✨❤️‍🩹🫶🏻🌹</div>
+    <div class="mensaje-final">
+      <span class="corazon-pulsante">💖</span> Para ti mi niña hermosa<br>
+      <span class="corazon-pulsante">✨</span> Con todo mi amor<br>
+      <span class="corazon-pulsante">🫶🏻</span> Tu noviecito<br>
+      <span class="corazon-pulsante">❤️‍🩹</span> Eres el amor de mi vida Vanessa te amo con todo mi ser 
+    </div>
+    <div class="ramo">💖✨🫶🏻❤️‍🩹🌹🌸💐</div>
+    <p style="text-align: center; margin-top: 30px;">
+      Toca los corazones para ver una sorpresa
+    </p>
+  </div>
+</div>
+
+<div class="indicador-paginas" id="indicador">1/11</div>
+
+<div class="botones">
+  <button onclick="cambiarPagina(-1)">⬅ Anterior</button>
+  <button onclick="cambiarPagina(1)">Siguiente ➡</button>
+</div>
+
+<script>
+  let paginaActual = 0;
+  const paginas = document.querySelectorAll('.pagina');
+  const indicador = document.getElementById('indicador');
+  
+  // Crear corazones flotantes
+  function crearCorazones() {
+    const colores = ['#ff6b6b', '#ff8e8e', '#ffb6c1', '#ff9aa2'];
+    for (let i = 0; i < 15; i++) {
+      const corazon = document.createElement('div');
+      corazon.innerHTML = '💖';
+      corazon.className = 'corazon-flotante';
+      corazon.style.left = `${Math.random() * 100}%`;
+      corazon.style.animationDuration = `${Math.random() * 10 + 10}s`;
+      corazon.style.animationDelay = `${Math.random() * 5}s`;
+      corazon.style.fontSize = `${Math.random() * 20 + 20}px`;
+      corazon.style.color = colores[Math.floor(Math.random() * colores.length)];
+      document.body.appendChild(corazon);
+    }
+  }
+  
+  function actualizarIndicador() {
+    indicador.textContent = `${paginaActual + 1}/${paginas.length}`;
+  }
+
+  function mostrarPagina(index) {
+    paginas.forEach((pagina, i) => {
+      pagina.classList.toggle('active', i === index);
+    });
+    actualizarIndicador();
+    
+    // Efecto especial en la última página
+    if(index === 10) {
+      lanzarConfeti();
+    }
+  }
+
+  function cambiarPagina(direccion) {
+    const nuevaPagina = paginaActual + direccion;
+    if (nuevaPagina >= 0 && nuevaPagina < paginas.length) {
+      paginaActual = nuevaPagina;
+      mostrarPagina(paginaActual);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Efecto de corazones al cambiar página
+      for(let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          const corazon = document.createElement('div');
+          corazon.innerHTML = '💖';
+          corazon.className = 'corazon-flotante';
+          corazon.style.left = `${50 + (Math.random() * 20 - 10)}%`;
+          corazon.style.animationDuration = '4s';
+          corazon.style.fontSize = '28px';
+          document.body.appendChild(corazon);
+          setTimeout(() => corazon.remove(), 4000);
+        }, i * 200);
+      }
+    }
+  }
+
+  // Función para lanzar confeti en la última página
+  function lanzarConfeti() {
+    const emojis = ['💖', '✨', '❤️‍🩹', '🫶🏻', '🌹', '🌸', '💐'];
+    const container = document.querySelector('.pagina:nth-child(11)');
+    
+    for(let i = 0; i < 30; i++) {
+      const confeti = document.createElement('div');
+      confeti.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+      confeti.style.position = 'absolute';
+      confeti.style.fontSize = `${Math.random() * 24 + 16}px`;
+      confeti.style.top = '0';
+      confeti.style.left = `${Math.random() * 100}%`;
+      confeti.style.opacity = '0.8';
+      confeti.style.zIndex = '5';
+      confeti.style.pointerEvents = 'none';
+      container.appendChild(confeti);
+      
+      // Animación
+      confeti.animate([
+        { transform: 'translateY(0) rotate(0deg)', opacity: 0.8 },
+        { transform: `translateY(300px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+      ], {
+        duration: 3000 + Math.random() * 2000,
+        easing: 'cubic-bezier(0,0.8,0.2,1)'
+      });
+      
+      // Eliminar después de animación
+      setTimeout(() => {
+        confeti.remove();
+      }, 5000);
+    }
+  }
+  
+  // Interacción para los corazones en la última página
+  document.addEventListener('click', function(e) {
+    if(paginaActual === 10 && e.target.classList.contains('corazon-pulsante')) {
+      const corazon = e.target;
+      corazon.animate([
+        { transform: 'scale(1)' },
+        { transform: 'scale(1.5)' },
+        { transform: 'scale(1)' }
+      ], {
+        duration: 600,
+        easing: 'ease-out'
+      });
+      
+      // Crear mini corazón flotante
+      const miniCorazon = document.createElement('div');
+      miniCorazon.innerHTML = '💖';
+      miniCorazon.style.position = 'fixed';
+      miniCorazon.style.left = `${e.clientX}px`;
+      miniCorazon.style.top = `${e.clientY}px`;
+      miniCorazon.style.fontSize = '24px';
+      miniCorazon.style.zIndex = '100';
+      miniCorazon.style.pointerEvents = 'none';
+      document.body.appendChild(miniCorazon);
+      
+      // Animación del mini corazón
+      miniCorazon.animate([
+        { transform: 'translateY(0)', opacity: 1 },
+        { transform: 'translateY(-50px)', opacity: 0 }
+      ], {
+        duration: 1000,
+        easing: 'ease-out'
+      });
+      
+      // Eliminar después de animación
+      setTimeout(() => {
+        miniCorazon.remove();
+      }, 1000);
+    }
+  });
+
+  // Iniciar con la primera página visible
+  mostrarPagina(paginaActual);
+  crearCorazones();
+  
+  // Agregar controles de teclado
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') cambiarPagina(-1);
+    if (e.key === 'ArrowRight') cambiarPagina(1);
+  });
+  
+  // Soporte para gestos táctiles (swipe)
+  let touchStartX = 0;
+  
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+  });
+  
+  document.addEventListener('touchend', e => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+    const swipeThreshold = 50;
+    
+    if (diff > swipeThreshold) {
+      cambiarPagina(1);
+    } else if (diff < -swipeThreshold) {
+      cambiarPagina(-1);
+    }
+  });
+</script>
+
+</body>
+</html>
